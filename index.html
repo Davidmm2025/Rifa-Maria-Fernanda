@@ -4,29 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rifa Solidária da Maria</title>
-    <!-- Carrega o Tailwind CSS para o estilo (design) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carrega os ícones -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Suaviza as animações de clique */
-        .transition-all { 
-            transition-property: all; 
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
-            transition-duration: 150ms; 
-        }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     </style>
 </head>
 <body class="min-h-screen bg-rose-50 font-sans text-slate-800 pb-24">
+
+    <!-- Banner de Administrador -->
+    <div id="admin-banner" class="hidden bg-slate-800 text-white p-3 text-center text-sm font-bold flex-col md:flex-row justify-center items-center gap-2">
+        <div class="flex items-center gap-2">
+            <i data-lucide="unlock" class="w-4 h-4 text-emerald-400"></i>
+            MODO ORGANIZADOR ATIVO: Clique nos números para os marcar como vendidos/livres.
+        </div>
+        <button onclick="logoutAdmin()" class="md:ml-4 px-3 py-1 bg-rose-500 rounded-full text-white hover:bg-rose-600 transition-colors">
+            Sair do Painel
+        </button>
+    </div>
 
     <!-- Cabeçalho -->
     <header class="bg-rose-500 text-white shadow-lg rounded-b-[2.5rem] pt-12 pb-16 px-6 text-center relative overflow-hidden">
         <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
         <div class="relative z-10 max-w-2xl mx-auto">
             <i data-lucide="heart" class="w-16 h-16 mx-auto mb-4 text-rose-200 fill-rose-200 animate-pulse"></i>
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">
-                Rifa Solidária da Maria
-            </h1>
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">Rifa Solidária da Maria</h1>
             <p class="text-rose-100 text-lg md:text-xl leading-relaxed max-w-xl mx-auto">
                 Estamos a organizar esta rifa com muito carinho para arrecadar o valor necessário para custear a consulta de retorno da Maria com a Neuropediatra.
             </p>
@@ -36,50 +38,28 @@
     <main class="max-w-4xl mx-auto px-4 -mt-8 relative z-20">
         <!-- Cartões de Informação -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4 transform transition hover:-translate-y-1">
-                <div class="bg-rose-100 p-3 rounded-full text-rose-500">
-                    <i data-lucide="gift" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 font-medium">Prémio</p>
-                    <p class="text-lg font-bold text-slate-800">1 Panela Elétrica</p>
-                </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4">
+                <div class="bg-rose-100 p-3 rounded-full text-rose-500"><i data-lucide="gift" class="w-8 h-8"></i></div>
+                <div><p class="text-sm text-slate-500 font-medium">Prémio</p><p class="text-lg font-bold text-slate-800">1 Panela Elétrica</p></div>
             </div>
-            
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4 transform transition hover:-translate-y-1">
-                <div class="bg-emerald-100 p-3 rounded-full text-emerald-500">
-                    <i data-lucide="dollar-sign" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 font-medium">Valor por Número</p>
-                    <p class="text-lg font-bold text-slate-800">R$ 20,00</p>
-                </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4">
+                <div class="bg-emerald-100 p-3 rounded-full text-emerald-500"><i data-lucide="dollar-sign" class="w-8 h-8"></i></div>
+                <div><p class="text-sm text-slate-500 font-medium">Valor por Número</p><p class="text-lg font-bold text-slate-800">R$ 20,00</p></div>
             </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4 transform transition hover:-translate-y-1">
-                <div class="bg-blue-100 p-3 rounded-full text-blue-500">
-                    <i data-lucide="target" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 font-medium">Meta</p>
-                    <p class="text-lg font-bold text-slate-800">50 Números</p>
-                </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-rose-100 flex items-center gap-4">
+                <div class="bg-blue-100 p-3 rounded-full text-blue-500"><i data-lucide="target" class="w-8 h-8"></i></div>
+                <div><p class="text-sm text-slate-500 font-medium">Meta</p><p class="text-lg font-bold text-slate-800">50 Números</p></div>
             </div>
         </div>
 
         <!-- Como participar & PIX -->
         <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-rose-100 mb-8">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <i data-lucide="info" class="text-rose-500"></i>
-                Como participar?
-            </h2>
-            
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="info" class="text-rose-500"></i>Como participar?</h2>
             <div class="space-y-4 mb-8 text-slate-600">
                 <p class="flex gap-3"><span class="font-bold text-rose-500">1.</span> Escolha os seus números na tabela abaixo.</p>
                 <p class="flex gap-3"><span class="font-bold text-rose-500">2.</span> Faça o pagamento via PIX correspondente ao valor total.</p>
                 <p class="flex gap-3"><span class="font-bold text-rose-500">3.</span> Envie o comprovativo no WhatsApp clicando no botão no final da página.</p>
             </div>
-
             <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
                 <h3 class="font-bold text-slate-800 mb-4">💳 Dados para o PIX</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -87,7 +67,7 @@
                         <p class="text-sm text-slate-500">Chave PIX</p>
                         <div class="flex items-center gap-2 mt-1">
                             <p id="pix-key-display" class="font-mono font-bold text-lg text-slate-800"></p>
-                            <button id="copy-btn" onclick="copyPix()" class="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors text-slate-600" title="Copiar chave PIX">
+                            <button id="copy-btn" onclick="copyPix()" class="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors text-slate-600">
                                 <i data-lucide="copy" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -104,28 +84,20 @@
         <!-- Seleção de Números -->
         <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-rose-100 mb-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <h2 class="text-2xl font-bold text-slate-800">
-                    Escolha os seus números
-                </h2>
-                
-                <!-- Legenda -->
+                <h2 class="text-2xl font-bold text-slate-800">Escolha os seus números</h2>
                 <div class="flex gap-4 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full border-2 border-rose-200 bg-white"></div>
-                        Livre
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full bg-rose-500"></div>
-                        Selecionado
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full bg-slate-200"></div>
-                        Vendido
-                    </div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full border-2 border-rose-200 bg-white"></div>Livre</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-rose-500"></div>Selecionado</div>
+                    <div class="flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-slate-200"></div>Vendido</div>
                 </div>
             </div>
+            
+            <!-- Aviso de Erro do Banco de Dados (Oculto por padrão) -->
+            <div id="db-error-alert" class="hidden mb-4 p-4 bg-red-50 text-red-600 rounded-xl border border-red-200 text-sm">
+                <p class="font-bold flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Erro de Permissão no Banco de Dados</p>
+                <p>Os números não puderam ser carregados. Por favor, verifique as "Regras" no seu Firebase Console e certifique-se de que estão definidas como `allow read, write: if true;`.</p>
+            </div>
 
-            <!-- Grelha de Números Gerada por JS -->
             <div id="grid-container" class="grid grid-cols-5 sm:grid-cols-10 gap-2 md:gap-3"></div>
         </div>
 
@@ -133,6 +105,10 @@
         <div class="text-center pb-8 px-4 text-slate-500 space-y-2">
             <p>🗓️ <strong>Data do Sorteio:</strong> Será realizado e gravado assim que todos os números forem vendidos!</p>
             <p>Agradecemos de coração a todos que puderem contribuir. Que Deus abençoe! 🙏✨</p>
+            
+            <button id="footer-admin-btn" onclick="showModal()" class="mt-8 text-xs text-slate-400 flex items-center justify-center gap-1 mx-auto hover:text-slate-600 transition-colors">
+                <i data-lucide="lock" class="w-3 h-3"></i> Acesso da Organização
+            </button>
         </div>
     </main>
 
@@ -144,40 +120,106 @@
                 <p id="floating-total" class="font-bold text-rose-500 text-lg"></p>
             </div>
             <button onclick="sendWhatsApp()" class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors shadow-sm">
-                <i data-lucide="message-circle" class="w-5 h-5"></i>
-                Enviar Comprovativo
-                <i data-lucide="arrow-right" class="w-5 h-5 ml-1"></i>
+                <i data-lucide="message-circle" class="w-5 h-5"></i> Enviar Comprovativo <i data-lucide="arrow-right" class="w-5 h-5 ml-1"></i>
             </button>
         </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT SIMPLIFICADA (Funciona 100% no GitHub Pages) -->
-    <script>
-        // --- CONFIGURAÇÕES DA RIFA ---
-        const CONFIG = {
-            pixKey: "12760792900", // A sua chave PIX
-            pixName: "Juliana Alvas Augusto Marconato", // Nome de quem recebe
-            pixBank: "Nubank", // Banco
-            whatsappNumber: "5544998319070", // O seu WhatsApp 
-            price: 20, // Valor da rifa
-            totalNumbers: 50,
-            
-            // 👇 QUANDO VENDER UM NÚMERO, ADICIONE AQUI 👇
-            // Exemplo: soldNumbers: [1, 2, 5, 10]
-            soldNumbers: [] 
+    <!-- Modal de Login -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-sm shadow-xl relative">
+            <button onclick="hideModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Painel de Controlo</h3>
+            <p class="text-sm text-slate-500 mb-6">Digite a senha para gerir os números.</p>
+            <input type="password" id="admin-password" placeholder="Senha: maria" class="w-full border border-slate-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent" onkeydown="if(event.key === 'Enter') handleLogin()">
+            <button onclick="handleLogin()" class="w-full bg-slate-800 text-white font-bold rounded-xl py-3 hover:bg-slate-900 transition-colors">Entrar</button>
+        </div>
+    </div>
+
+    <!-- LÓGICA DO BANCO DE DADOS -->
+    <script type="module">
+        // Importa as ferramentas do Firebase nas versões mais recentes (11.6.1)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // As suas chaves do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC5krfSsxq3vyrm5FAhEbMIPihiiIBnck",
+            authDomain: "rifa-maria-fernanda.firebaseapp.com",
+            projectId: "rifa-maria-fernanda",
+            storageBucket: "rifa-maria-fernanda.firebasestorage.app",
+            messagingSenderId: "972038384173",
+            appId: "1:972038384173:web:e37887d03c64084ce4a6a4",
+            measurementId: "G-9YH1B9YM8F"
         };
 
-        // Estado Global (Números que a pessoa clicou para comprar agora)
-        window.state = {
-            selectedNumbers: []
+        // Configurações da sua Rifa
+        const CONFIG = {
+            pixKey: "12760792900",
+            pixName: "Juliana Alvas Augusto Marconato",
+            pixBank: "Nubank",
+            whatsappNumber: "5544998319070",
+            price: 20,
+            totalNumbers: 50,
+            adminPassword: "maria" 
         };
+
+        window.state = { soldNumbers: [], selectedNumbers: [], isAdmin: false, showLoginModal: false };
+
+        // Inicializa Banco de Dados e Autenticação
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Referência do documento na base de dados
+        const rifaDocRef = doc(db, 'artifacts', 'rifa-maria', 'public', 'data', 'rifa_dados', 'main');
+
+        // Tenta autenticar silenciosamente para garantir acesso (se configurado)
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.warn("Aviso: Login anónimo falhou. Dependendo apenas das regras do Firestore.", error);
+            }
+        };
+        initAuth();
+
+        // Escuta os números em tempo real após a tentativa de Auth
+        onAuthStateChanged(auth, () => {
+            onSnapshot(rifaDocRef, (docSnap) => {
+                document.getElementById('db-error-alert').classList.add('hidden'); // Esconde erro se der certo
+                
+                if (docSnap.exists()) {
+                    window.state.soldNumbers = docSnap.data().soldNumbers || [];
+                } else {
+                    setDoc(rifaDocRef, { soldNumbers: [] }).catch(console.error);
+                }
+                renderApp();
+            }, (error) => {
+                console.error("Erro no Banco de Dados. Verifique as chaves e as Regras no Firebase.", error);
+                document.getElementById('db-error-alert').classList.remove('hidden'); // Mostra aviso de erro
+            });
+        });
 
         // Funções da Interface
-        window.toggleNumber = (num) => {
-            // Se já foi vendido, não faz nada
-            if (CONFIG.soldNumbers.includes(num)) return;
+        window.toggleNumber = async (num) => {
+            if (window.state.isAdmin) {
+                const newSoldNumbers = window.state.soldNumbers.includes(num)
+                    ? window.state.soldNumbers.filter(n => n !== num)
+                    : [...window.state.soldNumbers, num];
+                
+                try {
+                    await setDoc(rifaDocRef, { soldNumbers: newSoldNumbers }, { merge: true });
+                } catch (error) {
+                    alert("Erro ao gravar. Verifique as Regras do Firebase.");
+                    console.error(error);
+                }
+                return;
+            }
 
-            // Seleciona ou desmarca
+            if (window.state.soldNumbers.includes(num)) return;
+
             if (window.state.selectedNumbers.includes(num)) {
                 window.state.selectedNumbers = window.state.selectedNumbers.filter(n => n !== num);
             } else {
@@ -198,10 +240,7 @@
             const copyBtn = document.getElementById('copy-btn');
             copyBtn.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i>';
             lucide.createIcons();
-            setTimeout(() => {
-                copyBtn.innerHTML = '<i data-lucide="copy" class="w-5 h-5 text-slate-600"></i>';
-                lucide.createIcons();
-            }, 2000);
+            setTimeout(() => { copyBtn.innerHTML = '<i data-lucide="copy" class="w-5 h-5 text-slate-600"></i>'; lucide.createIcons(); }, 2000);
         };
 
         window.sendWhatsApp = () => {
@@ -212,58 +251,75 @@
             window.open(url, '_blank');
         };
 
-        // Renderiza tudo dinamicamente
+        window.showModal = () => { window.state.showLoginModal = true; renderApp(); };
+        window.hideModal = () => { window.state.showLoginModal = false; renderApp(); };
+        
+        window.handleLogin = () => {
+            const input = document.getElementById('admin-password');
+            if (input.value === CONFIG.adminPassword) {
+                window.state.isAdmin = true;
+                window.state.showLoginModal = false;
+                window.state.selectedNumbers = [];
+                input.value = '';
+                renderApp();
+            } else {
+                input.value = '';
+                alert("Senha incorreta");
+            }
+        };
+
+        window.logoutAdmin = () => { window.state.isAdmin = false; renderApp(); };
+
+        // Renderização HTML
         const renderApp = () => {
-            // Textos Iniciais Fixos
             document.getElementById('pix-key-display').textContent = CONFIG.pixKey;
             document.getElementById('pix-name-display').textContent = CONFIG.pixName;
             document.getElementById('pix-bank-display').textContent = CONFIG.pixBank;
 
-            // Grelha
+            const adminBanner = document.getElementById('admin-banner');
+            if (window.state.isAdmin) { adminBanner.classList.remove('hidden'); adminBanner.classList.add('flex'); }
+            else { adminBanner.classList.add('hidden'); adminBanner.classList.remove('flex'); }
+
             const grid = document.getElementById('grid-container');
             grid.innerHTML = '';
             for(let i=1; i<=CONFIG.totalNumbers; i++) {
-                const isSold = CONFIG.soldNumbers.includes(i);
+                const isSold = window.state.soldNumbers.includes(i);
                 const isSelected = window.state.selectedNumbers.includes(i);
                 const btn = document.createElement('button');
                 btn.textContent = i.toString().padStart(2, '0');
 
                 let btnClass = "aspect-square rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center ";
 
-                if (isSold) {
-                    btnClass += "bg-slate-100 text-slate-400 cursor-not-allowed border-2 border-transparent";
-                    btn.disabled = true;
-                } else if (isSelected) {
-                    btnClass += "bg-rose-500 text-white shadow-md transform scale-105 border-2 border-rose-500";
+                if (window.state.isAdmin) {
+                    if (isSold) { btnClass += "bg-slate-300 text-slate-600 border-2 border-slate-400 cursor-pointer hover:bg-slate-400 shadow-inner"; }
+                    else { btnClass += "bg-white text-rose-600 border-2 border-rose-200 hover:border-rose-400 cursor-pointer shadow-sm"; }
                     btn.onclick = () => window.toggleNumber(i);
                 } else {
-                    btnClass += "bg-white text-rose-600 border-2 border-rose-200 hover:border-rose-400 hover:bg-rose-50 cursor-pointer shadow-sm";
-                    btn.onclick = () => window.toggleNumber(i);
+                    if (isSold) { btnClass += "bg-slate-100 text-slate-400 cursor-not-allowed border-2 border-transparent"; btn.disabled = true; }
+                    else if (isSelected) { btnClass += "bg-rose-500 text-white shadow-md transform scale-105 border-2 border-rose-500"; btn.onclick = () => window.toggleNumber(i); }
+                    else { btnClass += "bg-white text-rose-600 border-2 border-rose-200 hover:border-rose-400 hover:bg-rose-50 cursor-pointer shadow-sm"; btn.onclick = () => window.toggleNumber(i); }
                 }
-                
                 btn.className = btnClass;
                 grid.appendChild(btn);
             }
 
-            // Barra Flutuante
+            const footerAdminBtn = document.getElementById('footer-admin-btn');
+            if (window.state.isAdmin) footerAdminBtn.classList.add('hidden'); else footerAdminBtn.classList.remove('hidden');
+
             const floatingBar = document.getElementById('floating-bar');
-            if (window.state.selectedNumbers.length > 0) {
+            if (!window.state.isAdmin && window.state.selectedNumbers.length > 0) {
                 floatingBar.classList.remove('hidden');
                 document.getElementById('floating-count').textContent = `Selecionou ${window.state.selectedNumbers.length} número(s):`;
-                const total = (window.state.selectedNumbers.length * CONFIG.price).toFixed(2).replace('.', ',');
-                document.getElementById('floating-total').textContent = `Total: R$ ${total}`;
-            } else {
-                floatingBar.classList.add('hidden');
-            }
+                document.getElementById('floating-total').textContent = `Total: R$ ${(window.state.selectedNumbers.length * CONFIG.price).toFixed(2).replace('.', ',')}`;
+            } else { floatingBar.classList.add('hidden'); }
 
-            // Ativar os ícones
+            const loginModal = document.getElementById('login-modal');
+            if (window.state.showLoginModal) { loginModal.classList.remove('hidden'); loginModal.classList.add('flex'); }
+            else { loginModal.classList.add('hidden'); loginModal.classList.remove('flex'); }
+
             lucide.createIcons();
         };
-
-        // Arranca a App assim que a página carrega
-        window.onload = () => {
-            renderApp();
-        };
+        window.onload = renderApp;
     </script>
 </body>
 </html>
