@@ -106,7 +106,7 @@
             <p>🗓️ <strong>Data do Sorteio:</strong> Será realizado e gravado assim que todos os números forem vendidos!</p>
             <p>Agradecemos de coração a todos que puderem contribuir. Que Deus abençoe! 🙏✨</p>
             
-            <!-- Botão de Administrador (Mais visível agora) -->
+            <!-- Botão de Administrador -->
             <div class="pt-6">
                 <button id="footer-admin-btn" onclick="showModal()" class="mt-4 text-sm text-slate-600 bg-white border border-slate-200 px-6 py-2 rounded-full flex items-center justify-center gap-2 mx-auto hover:bg-slate-50 hover:text-slate-800 transition-all shadow-sm">
                     <i data-lucide="lock" class="w-4 h-4"></i> Acesso da Organização
@@ -134,7 +134,8 @@
             <button onclick="hideModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             <h3 class="text-xl font-bold text-slate-800 mb-2">Painel de Controlo</h3>
             <p class="text-sm text-slate-500 mb-6">Digite a senha para gerir os números.</p>
-            <input type="password" id="admin-password" placeholder="Senha: maria" class="w-full border border-slate-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent" onkeydown="if(event.key === 'Enter') handleLogin()">
+            <!-- Removida a dica da senha do placeholder para maior segurança -->
+            <input type="password" id="admin-password" placeholder="Senha de acesso" class="w-full border border-slate-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent" onkeydown="if(event.key === 'Enter') handleLogin()">
             <button onclick="handleLogin()" class="w-full bg-slate-800 text-white font-bold rounded-xl py-3 hover:bg-slate-900 transition-colors">Entrar</button>
         </div>
     </div>
@@ -168,7 +169,6 @@
 
     <!-- LÓGICA DO BANCO DE DADOS -->
     <script type="module">
-        // Importa as ferramentas do Firebase nas versões mais recentes (11.6.1)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -184,7 +184,6 @@
             measurementId: "G-9YH1B9YM8F"
         };
 
-        // Configurações da sua Rifa
         const CONFIG = {
             pixKey: "12760792900",
             pixName: "Juliana Alvas Augusto Marconato",
@@ -197,15 +196,12 @@
 
         window.state = { soldNumbers: {}, selectedNumbers: [], isAdmin: false, showLoginModal: false, showNameModal: false, showDeleteModal: false, pendingNumber: null };
 
-        // Inicializa Banco de Dados e Autenticação
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Referência do documento na base de dados
         const rifaDocRef = doc(db, 'artifacts', 'rifa-maria', 'public', 'data', 'rifa_dados', 'main');
 
-        // Tenta autenticar silenciosamente para garantir acesso
         const initAuth = async () => {
             try {
                 await signInAnonymously(auth);
@@ -215,14 +211,12 @@
         };
         initAuth();
 
-        // Escuta os números em tempo real após a tentativa de Auth
         onAuthStateChanged(auth, () => {
             onSnapshot(rifaDocRef, (docSnap) => {
-                document.getElementById('db-error-alert').classList.add('hidden'); // Esconde erro se der certo
+                document.getElementById('db-error-alert').classList.add('hidden');
                 
                 if (docSnap.exists()) {
                     let data = docSnap.data().soldNumbers;
-                    // Compatibilidade com os números antigos (converte os antigos para objeto)
                     if (Array.isArray(data)) {
                         let obj = {};
                         data.forEach(num => obj[num] = "");
@@ -235,23 +229,20 @@
                 }
                 renderApp();
             }, (error) => {
-                console.error("Erro no Banco de Dados. Verifique as chaves e as Regras no Firebase.", error);
-                document.getElementById('db-error-alert').classList.remove('hidden'); // Mostra aviso de erro
+                console.error("Erro no Banco de Dados.", error);
+                document.getElementById('db-error-alert').classList.remove('hidden');
             });
         });
 
-        // Funções da Interface
         window.toggleNumber = async (num) => {
             if (window.state.isAdmin) {
                 const isSold = num in window.state.soldNumbers;
                 
                 if (isSold) {
-                    // Em vez do alerta padrão, abre a nova janela de exclusão
                     window.state.pendingNumber = num;
                     window.state.showDeleteModal = true;
                     renderApp();
                 } else {
-                    // Se está livre, abre o modal para inserir o nome
                     window.state.pendingNumber = num;
                     window.state.showNameModal = true;
                     renderApp();
@@ -260,7 +251,6 @@
                 return;
             }
 
-            // Fluxo de utilizador normal
             const isSold = num in window.state.soldNumbers;
             if (isSold) return;
 
@@ -273,7 +263,6 @@
             renderApp();
         };
 
-        // Função para confirmar o nome do comprador no modal
         window.confirmName = async () => {
             const nameInput = document.getElementById('buyer-name').value.trim();
             const num = window.state.pendingNumber;
@@ -281,10 +270,9 @@
             if (!num) return;
             
             const newSoldNumbers = { ...window.state.soldNumbers };
-            newSoldNumbers[num] = nameInput || "Vendido"; // Se deixar em branco, guarda apenas "Vendido"
+            newSoldNumbers[num] = nameInput || "Vendido";
             
             try {
-                // Removido o { merge: true } para manter a consistência ao salvar a lista
                 await setDoc(rifaDocRef, { soldNumbers: newSoldNumbers });
                 window.state.showNameModal = false;
                 window.state.pendingNumber = null;
@@ -368,7 +356,6 @@
 
         window.logoutAdmin = () => { window.state.isAdmin = false; renderApp(); };
 
-        // Renderização HTML
         const renderApp = () => {
             document.getElementById('pix-key-display').textContent = CONFIG.pixKey;
             document.getElementById('pix-name-display').textContent = CONFIG.pixName;
@@ -384,17 +371,29 @@
                 const isSold = window.state.soldNumbers.hasOwnProperty(i);
                 const isSelected = window.state.selectedNumbers.includes(i);
                 const btn = document.createElement('button');
-                btn.textContent = i.toString().padStart(2, '0');
+                
+                // Botão volta ao visual original limpo, mas ganha a classe 'group relative' para o balão flutuante funcionar
+                let btnClass = "group relative aspect-square rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center ";
+                let contentHTML = `<span>${i.toString().padStart(2, '0')}</span>`;
 
-                let btnClass = "aspect-square rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center ";
-
-                // Adiciona Tooltip com o nome da pessoa se estiver vendido
                 if (isSold) {
-                    const buyerName = window.state.soldNumbers[i];
-                    btn.title = buyerName ? `Comprador: ${buyerName}` : "Vendido";
+                    const buyerName = window.state.soldNumbers[i] || "Vendido";
+                    btn.title = buyerName; // Fallback de sistema
+                    
+                    // Balão flutuante (Tooltip) customizado com Tailwind
+                    contentHTML += `
+                        <div class="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap">
+                            <div class="bg-slate-800 text-white text-xs rounded-lg py-1.5 px-3 shadow-lg font-normal">
+                                ${buyerName}
+                            </div>
+                            <div class="w-2 h-2 bg-slate-800 rotate-45 absolute left-1/2 -translate-x-1/2 -bottom-1"></div>
+                        </div>
+                    `;
                 } else {
                     btn.title = "Livre";
                 }
+
+                btn.innerHTML = contentHTML;
 
                 if (window.state.isAdmin) {
                     if (isSold) { btnClass += "bg-slate-300 text-slate-600 border-2 border-slate-400 cursor-pointer hover:bg-slate-400 shadow-inner"; }
@@ -423,7 +422,6 @@
             if (window.state.showLoginModal) { loginModal.classList.remove('hidden'); loginModal.classList.add('flex'); }
             else { loginModal.classList.add('hidden'); loginModal.classList.remove('flex'); }
 
-            // Lógica para abrir/fechar o Modal de Nome
             const nameModal = document.getElementById('name-modal');
             if (window.state.showNameModal) { 
                 nameModal.classList.remove('hidden'); nameModal.classList.add('flex');
@@ -432,7 +430,6 @@
                 nameModal.classList.add('hidden'); nameModal.classList.remove('flex'); 
             }
 
-            // Lógica para abrir/fechar o Modal de Exclusão
             const deleteModal = document.getElementById('delete-modal');
             if (window.state.showDeleteModal) { 
                 deleteModal.classList.remove('hidden'); deleteModal.classList.add('flex');
