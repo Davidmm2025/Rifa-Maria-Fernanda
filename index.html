@@ -102,13 +102,16 @@
         </div>
 
         <!-- Informação do Rodapé -->
-        <div class="text-center pb-8 px-4 text-slate-500 space-y-2">
+        <div class="text-center pb-12 px-4 text-slate-500 space-y-4">
             <p>🗓️ <strong>Data do Sorteio:</strong> Será realizado e gravado assim que todos os números forem vendidos!</p>
             <p>Agradecemos de coração a todos que puderem contribuir. Que Deus abençoe! 🙏✨</p>
             
-            <button id="footer-admin-btn" onclick="showModal()" class="mt-8 text-xs text-slate-400 flex items-center justify-center gap-1 mx-auto hover:text-slate-600 transition-colors">
-                <i data-lucide="lock" class="w-3 h-3"></i> Acesso da Organização
-            </button>
+            <!-- Botão de Administrador (Mais visível agora) -->
+            <div class="pt-6">
+                <button id="footer-admin-btn" onclick="showModal()" class="mt-4 text-sm text-slate-600 bg-white border border-slate-200 px-6 py-2 rounded-full flex items-center justify-center gap-2 mx-auto hover:bg-slate-50 hover:text-slate-800 transition-all shadow-sm">
+                    <i data-lucide="lock" class="w-4 h-4"></i> Acesso da Organização
+                </button>
+            </div>
         </div>
     </main>
 
@@ -133,6 +136,33 @@
             <p class="text-sm text-slate-500 mb-6">Digite a senha para gerir os números.</p>
             <input type="password" id="admin-password" placeholder="Senha: maria" class="w-full border border-slate-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent" onkeydown="if(event.key === 'Enter') handleLogin()">
             <button onclick="handleLogin()" class="w-full bg-slate-800 text-white font-bold rounded-xl py-3 hover:bg-slate-900 transition-colors">Entrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Nome do Comprador -->
+    <div id="name-modal" class="hidden fixed inset-0 bg-slate-900/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-sm shadow-xl relative">
+            <button onclick="closeNameModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Registar Venda</h3>
+            <p class="text-sm text-slate-500 mb-6">Digite o nome da pessoa que comprou o número <span id="pending-number-display" class="font-bold text-rose-500"></span>.</p>
+            <input type="text" id="buyer-name" placeholder="Ex: João Silva" class="w-full border border-slate-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent" onkeydown="if(event.key === 'Enter') confirmName()">
+            <button onclick="confirmName()" class="w-full bg-rose-500 text-white font-bold rounded-xl py-3 hover:bg-rose-600 transition-colors">Guardar Número</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-slate-900/50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-sm shadow-xl relative text-center">
+            <button onclick="closeDeleteModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Libertar Número?</h3>
+            <p class="text-sm text-slate-500 mb-6">Deseja remover o comprador <strong id="delete-buyer-name" class="text-slate-800"></strong> e libertar o número <strong id="delete-number-display" class="text-rose-500"></strong>?</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-3 hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button onclick="confirmDelete()" class="flex-1 bg-red-500 text-white font-bold rounded-xl py-3 hover:bg-red-600 transition-colors">Sim, Libertar</button>
+            </div>
         </div>
     </div>
 
@@ -165,7 +195,7 @@
             adminPassword: "maria" 
         };
 
-        window.state = { soldNumbers: [], selectedNumbers: [], isAdmin: false, showLoginModal: false };
+        window.state = { soldNumbers: {}, selectedNumbers: [], isAdmin: false, showLoginModal: false, showNameModal: false, showDeleteModal: false, pendingNumber: null };
 
         // Inicializa Banco de Dados e Autenticação
         const app = initializeApp(firebaseConfig);
@@ -175,7 +205,7 @@
         // Referência do documento na base de dados
         const rifaDocRef = doc(db, 'artifacts', 'rifa-maria', 'public', 'data', 'rifa_dados', 'main');
 
-        // Tenta autenticar silenciosamente para garantir acesso (se configurado)
+        // Tenta autenticar silenciosamente para garantir acesso
         const initAuth = async () => {
             try {
                 await signInAnonymously(auth);
@@ -191,9 +221,17 @@
                 document.getElementById('db-error-alert').classList.add('hidden'); // Esconde erro se der certo
                 
                 if (docSnap.exists()) {
-                    window.state.soldNumbers = docSnap.data().soldNumbers || [];
+                    let data = docSnap.data().soldNumbers;
+                    // Compatibilidade com os números antigos (converte os antigos para objeto)
+                    if (Array.isArray(data)) {
+                        let obj = {};
+                        data.forEach(num => obj[num] = "");
+                        window.state.soldNumbers = obj;
+                    } else {
+                        window.state.soldNumbers = data || {};
+                    }
                 } else {
-                    setDoc(rifaDocRef, { soldNumbers: [] }).catch(console.error);
+                    setDoc(rifaDocRef, { soldNumbers: {} }).catch(console.error);
                 }
                 renderApp();
             }, (error) => {
@@ -205,20 +243,26 @@
         // Funções da Interface
         window.toggleNumber = async (num) => {
             if (window.state.isAdmin) {
-                const newSoldNumbers = window.state.soldNumbers.includes(num)
-                    ? window.state.soldNumbers.filter(n => n !== num)
-                    : [...window.state.soldNumbers, num];
+                const isSold = num in window.state.soldNumbers;
                 
-                try {
-                    await setDoc(rifaDocRef, { soldNumbers: newSoldNumbers }, { merge: true });
-                } catch (error) {
-                    alert("Erro ao gravar. Verifique as Regras do Firebase.");
-                    console.error(error);
+                if (isSold) {
+                    // Em vez do alerta padrão, abre a nova janela de exclusão
+                    window.state.pendingNumber = num;
+                    window.state.showDeleteModal = true;
+                    renderApp();
+                } else {
+                    // Se está livre, abre o modal para inserir o nome
+                    window.state.pendingNumber = num;
+                    window.state.showNameModal = true;
+                    renderApp();
+                    setTimeout(() => document.getElementById('buyer-name').focus(), 100);
                 }
                 return;
             }
 
-            if (window.state.soldNumbers.includes(num)) return;
+            // Fluxo de utilizador normal
+            const isSold = num in window.state.soldNumbers;
+            if (isSold) return;
 
             if (window.state.selectedNumbers.includes(num)) {
                 window.state.selectedNumbers = window.state.selectedNumbers.filter(n => n !== num);
@@ -226,6 +270,60 @@
                 window.state.selectedNumbers.push(num);
                 window.state.selectedNumbers.sort((a, b) => a - b);
             }
+            renderApp();
+        };
+
+        // Função para confirmar o nome do comprador no modal
+        window.confirmName = async () => {
+            const nameInput = document.getElementById('buyer-name').value.trim();
+            const num = window.state.pendingNumber;
+            
+            if (!num) return;
+            
+            const newSoldNumbers = { ...window.state.soldNumbers };
+            newSoldNumbers[num] = nameInput || "Vendido"; // Se deixar em branco, guarda apenas "Vendido"
+            
+            try {
+                // Removido o { merge: true } para manter a consistência ao salvar a lista
+                await setDoc(rifaDocRef, { soldNumbers: newSoldNumbers });
+                window.state.showNameModal = false;
+                window.state.pendingNumber = null;
+                document.getElementById('buyer-name').value = '';
+                renderApp();
+            } catch (error) {
+                alert("Erro ao gravar. Verifique as Regras do Firebase.");
+                console.error(error);
+            }
+        };
+
+        window.closeNameModal = () => {
+            window.state.showNameModal = false;
+            window.state.pendingNumber = null;
+            document.getElementById('buyer-name').value = '';
+            renderApp();
+        };
+
+        window.confirmDelete = async () => {
+            const num = window.state.pendingNumber;
+            if (!num) return;
+
+            const newSoldNumbers = { ...window.state.soldNumbers };
+            delete newSoldNumbers[num];
+
+            try {
+                await setDoc(rifaDocRef, { soldNumbers: newSoldNumbers });
+                window.state.showDeleteModal = false;
+                window.state.pendingNumber = null;
+                renderApp();
+            } catch (error) {
+                alert("Erro ao gravar. Verifique as Regras do Firebase.");
+                console.error(error);
+            }
+        };
+
+        window.closeDeleteModal = () => {
+            window.state.showDeleteModal = false;
+            window.state.pendingNumber = null;
             renderApp();
         };
 
@@ -283,12 +381,20 @@
             const grid = document.getElementById('grid-container');
             grid.innerHTML = '';
             for(let i=1; i<=CONFIG.totalNumbers; i++) {
-                const isSold = window.state.soldNumbers.includes(i);
+                const isSold = window.state.soldNumbers.hasOwnProperty(i);
                 const isSelected = window.state.selectedNumbers.includes(i);
                 const btn = document.createElement('button');
                 btn.textContent = i.toString().padStart(2, '0');
 
                 let btnClass = "aspect-square rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center ";
+
+                // Adiciona Tooltip com o nome da pessoa se estiver vendido
+                if (isSold) {
+                    const buyerName = window.state.soldNumbers[i];
+                    btn.title = buyerName ? `Comprador: ${buyerName}` : "Vendido";
+                } else {
+                    btn.title = "Livre";
+                }
 
                 if (window.state.isAdmin) {
                     if (isSold) { btnClass += "bg-slate-300 text-slate-600 border-2 border-slate-400 cursor-pointer hover:bg-slate-400 shadow-inner"; }
@@ -316,6 +422,25 @@
             const loginModal = document.getElementById('login-modal');
             if (window.state.showLoginModal) { loginModal.classList.remove('hidden'); loginModal.classList.add('flex'); }
             else { loginModal.classList.add('hidden'); loginModal.classList.remove('flex'); }
+
+            // Lógica para abrir/fechar o Modal de Nome
+            const nameModal = document.getElementById('name-modal');
+            if (window.state.showNameModal) { 
+                nameModal.classList.remove('hidden'); nameModal.classList.add('flex');
+                document.getElementById('pending-number-display').textContent = window.state.pendingNumber;
+            } else { 
+                nameModal.classList.add('hidden'); nameModal.classList.remove('flex'); 
+            }
+
+            // Lógica para abrir/fechar o Modal de Exclusão
+            const deleteModal = document.getElementById('delete-modal');
+            if (window.state.showDeleteModal) { 
+                deleteModal.classList.remove('hidden'); deleteModal.classList.add('flex');
+                document.getElementById('delete-number-display').textContent = window.state.pendingNumber;
+                document.getElementById('delete-buyer-name').textContent = window.state.soldNumbers[window.state.pendingNumber] || 'Sem nome';
+            } else { 
+                deleteModal.classList.add('hidden'); deleteModal.classList.remove('flex'); 
+            }
 
             lucide.createIcons();
         };
